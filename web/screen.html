@@ -6,9 +6,22 @@
 <link rel="stylesheet" href="/css/css.css" />
 <link rel="stylesheet" href="/css/screen.css" />
 
-<body>
-  <div>Testing</div>
-</body>
+<!DOCTYPE html>
+<script src="build/wasm_exec.js"></script>
+<script>
+// Polyfill
+if (!WebAssembly.instantiateStreaming) {
+    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+        const source = await (await resp).arrayBuffer();
+        return await WebAssembly.instantiate(source, importObject);
+    };
+}
+
+const go = new Go();
+WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then(result => {
+    go.run(result.instance);
+});
+</script>
 
 <script type="text/javascript">
   let airconsole;
@@ -17,6 +30,7 @@
   let activePlayers = [];
   let paused = false;
   let initialized = false;
+
 
   setupAirConsole();
   gameLoop();
@@ -27,6 +41,7 @@
         let playerDetails = getPlayerDetails(player_id);
         // console.log(activePlayers);
         // console.log(playerDetails);
+        receiveAction("test-action");
       });
     }
 
@@ -78,23 +93,11 @@
 
         airconsole.message(from, "Action received!");
       }
-      if(data.type === "text") {
-        console.log("Player " + (player + 1) + " Text received: " + data.content);
-
-        // Show message on device screen
-        var info = document.createElement("DIV");
-        info.innerHTML = "Player: " + (player + 1) + " Message received: " + data.content
-        document.body.appendChild(info);
-
-        // We receive a message -> Send message back to the device
-        airconsole.message(from, "Response from the game screen!");
-      }
     };
   }
 
   // Function to handle the number of players connected
   // Limits the number of active players to the maxPlayers amount
-  // Sets a custom device state property "enoughPlayers" to true if the number of active players is between minPlayers and maxPlayers
   function handlePlayers() {
     var connectedControllers = airconsole.getControllerDeviceIds();
 
@@ -103,11 +106,8 @@
             ? maxPlayers
             : airconsole.getControllerDeviceIds().length;
 
-
     activePlayers = airconsole.getActivePlayerDeviceIds();
     airconsole.setActivePlayers(validPlayersCount);
-
-    airconsole.setCustomDeviceStateProperty("enoughPlayers", validPlayersCount >= minPlayers && validPlayersCount <= maxPlayers);
   }
 
   function getPlayerDetails(player_id) {
