@@ -1,0 +1,26 @@
+<script
+  type="text/javascript"
+  src="https://www.airconsole.com/api/airconsole-1.8.0.js"
+></script>
+
+<link rel="stylesheet" href="/css/css.css">
+<link rel="stylesheet" href="/css/screen.css">
+
+<body>
+    <div>Testing</div>
+</body>
+
+<script type="text/javascript">
+  var airconsole = new AirConsole();
+
+  // Listen for messages from other devices
+  airconsole.onMessage = function (from, data) {
+    // We receive a message -> Send message back to the device
+    airconsole.message(from, "Response from the game screen!");
+
+    // Show message on device screen
+    var info = document.createElement("DIV");
+    info.innerHTML = data;
+    document.body.appendChild(info);
+  };
+</script>

@@ -1,0 +1,7 @@
+/* 
+    This css file is loaded by both the controller and screen views. 
+    Implement any shared styles here.
+*/
+body {
+    background-color: white;
+}
