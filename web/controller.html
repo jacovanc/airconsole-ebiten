@@ -3,19 +3,41 @@
   src="https://www.airconsole.com/api/airconsole-1.8.0.js"
 ></script>
 
-<link rel="stylesheet" href="/css/css.css">
-<link rel="stylesheet" href="/css/controller.css">
+<link rel="stylesheet" href="/css/css.css" />
+<link rel="stylesheet" href="/css/controller.css" />
 
 <body>
-    <button id="btn-msg">Send Message</button>
+  <div id="player_id">No player</div>
+  <button id="btn-msg">Send Message</button>
+
+  <button id="action-1">Action 1</button>
+  <button id="action-2">Action 2</button>
 </body>
 
 <script type="text/javascript">
-  var airconsole = new AirConsole();
+  let airconsole = new AirConsole({
+    orientation: "landscape",
+  }); // Can adjust options here
 
-  // When we press our button, we send a message to the screen
-  document.getElementById("btn-msg").addEventListener("click", function () {
-    airconsole.message(AirConsole.SCREEN, "Message from the controller");
+  // Perform logic based on if the controller is active (not just connected). A controller is not active when the screen has limited the number of players.
+  // Can be used to show a message to the user that they can't play because there are too many players, or to show a message that they are player 1, 2, 3, etc.
+  airconsole.onActivePlayersChange = function(playerId) {
+    var div = document.getElementById("player_id");
+    if (playerId !== undefined) {
+      // If player is set, then this controller is active
+      div.innerHTML =  "Player " + (playerId + 1);
+    } else {
+      // If player is not set, then this controller is not active
+      div.innerHTML = "Too many players!";
+    }
+  };
+
+  document.getElementById("action-1").addEventListener("click", function () {
+    sendAction("action-1");
+  });
+
+  document.getElementById("action-2").addEventListener("click", function () {
+    sendAction("action-2");
   });
 
   // Listen for messages
@@ -25,4 +47,12 @@
     info.innerHTML = data;
     document.body.appendChild(info);
   };
+
+  function sendAction(action) {
+    message = {
+      type: "action",
+      action: action,
+    };
+    airconsole.message(AirConsole.SCREEN, message);
+  }
 </script>

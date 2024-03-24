@@ -27,7 +27,7 @@ For local development, PHP's built-in server is a convenient option. Follow thes
 - **Check PHP Installation**: Ensure PHP is installed on your machine. Verify this by running php -v in your command line.
 - **Start PHP Server**: In the command line, navigate to the web/ directory and start the server:
 ```
-php -S localhost:8000
+php -S 0.0.0.0:8000
 ```
 - **Access The Project**: With the server running, you can access the game and controller interfaces at:
 Game interface: http://localhost:8000/screen.html
@@ -43,3 +43,24 @@ Depending on how you are hosting, you may want to setup a redirect at the route 
  - http://www.airconsole.com/#http://192.168.0.1:8080/ (this will let you play the game via the airconsole controller app)
  - http://www.airconsole.com/simulator/#http://192.168.0.1:8080/ (this will simulate the controllers in a split screen)
 
+## Building the Go game web assembly
+In order to actually play our Go game, we need to compile it to web assembly so that it is served up from our web directly.
+To compile it, we follow the instructions from [https://ebitengine.org/en/documents/webassembly.html](Option 2)
+Instructions for Windows below, it should be pretty clear from the above link how to do it on linux.
+
+### Windows (powershell)
+This defines the build destination in the web/build directory. Be sure to put the same URL as defined in your go.mod.
+Execute this from within the game folder.
+```
+$Env:GOOS = 'js'
+$Env:GOARCH = 'wasm'
+go build -o ../web/build/game.wasm github.com/jacovanc/airconsole-ebiten/game
+Remove-Item Env:GOOS
+Remove-Item Env:GOARCH
+```
+
+We then need to create an executable that can be executed from our html
+```
+$goroot = go env GOROOT
+cp $goroot\misc\wasm\wasm_exec.js ../web/build/wasm_exec.js
+```

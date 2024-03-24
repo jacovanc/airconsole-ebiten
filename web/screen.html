@@ -3,24 +3,126 @@
   src="https://www.airconsole.com/api/airconsole-1.8.0.js"
 ></script>
 
-<link rel="stylesheet" href="/css/css.css">
-<link rel="stylesheet" href="/css/screen.css">
+<link rel="stylesheet" href="/css/css.css" />
+<link rel="stylesheet" href="/css/screen.css" />
 
-<body>
-    <div>Testing</div>
-</body>
+<!DOCTYPE html>
+<script src="build/wasm_exec.js"></script>
+<script>
+// Polyfill
+if (!WebAssembly.instantiateStreaming) {
+    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+        const source = await (await resp).arrayBuffer();
+        return await WebAssembly.instantiate(source, importObject);
+    };
+}
+
+const go = new Go();
+WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then(result => {
+    go.run(result.instance);
+});
+</script>
 
 <script type="text/javascript">
-  var airconsole = new AirConsole();
+  let airconsole;
+  let minPlayers = 1;
+  let maxPlayers = 2;
+  let activePlayers = [];
+  let paused = false;
+  let initialized = false;
 
-  // Listen for messages from other devices
-  airconsole.onMessage = function (from, data) {
-    // We receive a message -> Send message back to the device
-    airconsole.message(from, "Response from the game screen!");
 
-    // Show message on device screen
-    var info = document.createElement("DIV");
-    info.innerHTML = data;
-    document.body.appendChild(info);
-  };
+  setupAirConsole();
+  gameLoop();
+
+  function gameLoop() {
+    if (!paused) {
+      activePlayers.forEach((player_id) => {
+        let playerDetails = getPlayerDetails(player_id);
+        // console.log(activePlayers);
+        // console.log(playerDetails);
+        receiveAction("test-action");
+      });
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function setupAirConsole() {
+    airconsole = new AirConsole({ silence_inactive_players: true });
+
+    airconsole.onPause = function () {
+      console.warn("Pausing game");
+      paused = true;
+    };
+
+    airconsole.onResume = function () {
+      console.warn("Resuming game");
+      paused = false;
+    };
+    
+    airconsole.onConnect = function (device_id) {
+      // Here we can do any logic we want when a new device connects, such as checking that enough players have joined.
+      if(!initialized) {
+        // Do any actions that should only be done once here (on first device connect)
+        initialized = true;
+      }
+
+      handlePlayers(); // This will set the number of active players, limitted to the maxPlayers amount
+
+      // We have a new device connected -> Send message to the device
+      airconsole.message(device_id, "Hello from the game screen!");
+    };
+
+    airconsole.onDisconnect = function (device_id) {
+      // Here we can do any logic we want when a device disconnects, such as checking if the game should end.
+
+      handlePlayers();
+    };
+
+    // Listen for messages from other devices
+    airconsole.onMessage = function (from, data) {
+      let player = airconsole.convertDeviceIdToPlayerNumber(from);
+      if(data.type === "action") {
+        console.log("Player: " + (player + 1) + " Action received: " + data.action);
+
+        // Show message on device screen
+        var info = document.createElement("DIV");
+        info.innerHTML = "Player: " + (player + 1) + " Action received: " + data.action
+        document.body.appendChild(info);
+
+        airconsole.message(from, "Action received!");
+      }
+    };
+  }
+
+  // Function to handle the number of players connected
+  // Limits the number of active players to the maxPlayers amount
+  function handlePlayers() {
+    var connectedControllers = airconsole.getControllerDeviceIds();
+
+    // Set the number of active players (here we will use the total number of devices connected, but limit it to maxPlayers amount)
+    let validPlayersCount = connectedControllers.length > maxPlayers
+            ? maxPlayers
+            : airconsole.getControllerDeviceIds().length;
+
+    activePlayers = airconsole.getActivePlayerDeviceIds();
+    airconsole.setActivePlayers(validPlayersCount);
+  }
+
+  function getPlayerDetails(player_id) {
+    let player = airconsole.convertDeviceIdToPlayerNumber(player_id);
+    let name = airconsole.getNickname(player_id);
+    let profilePicture = airconsole.getProfilePicture(player_id);
+    let customData = airconsole.getCustomDeviceState(player_id);
+    let active = airconsole.getActivePlayerDeviceIds().includes(player_id);
+
+    return {
+      player: player,
+      name: name,
+      profilePicture: profilePicture,
+      customData: customData,
+      active: active,
+    };
+  }
 </script>
