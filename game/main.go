@@ -2,36 +2,38 @@ package main
 
 import (
 	"log"
-	"syscall/js"
+	"strconv"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type Game struct{}
 
-var output string = "Hello, World!"
+type action struct {
+	playerId int
+	input string
+	direction string
+}
+var lastAction action = action{playerId: -1, input: "", direction: ""}
+
+type Game struct{}
 
 func (g *Game) Update() error {
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, output)
+	// Print the player ID and action to the screen
+	outputString := "Player ID: " + strconv.Itoa(lastAction.playerId) + " Action: " + lastAction.input + " Direction: " + lastAction.direction
+	ebitenutil.DebugPrint(screen, outputString);
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return outsideWidth, outsideHeight
+	return 640, 480
 }
 
 func main() {
-	// Create a callback function for handling input passed from JS
-    js.Global().Set("receiveAction", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-        if len(args) > 0 {
-            output = args[0].String()
-        }
-        return nil
-    }))
+	setupAirconsoleInput()
 
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Hello, World!")
