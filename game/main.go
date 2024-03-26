@@ -8,24 +8,23 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-
-type action struct {
-	playerId int
-	input string
-	direction string
+type Game struct{
+	PlayerManager *PlayerManager
 }
-var lastAction action = action{playerId: -1, input: "", direction: ""}
-
-type Game struct{}
 
 func (g *Game) Update() error {
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Print the player ID and action to the screen
-	outputString := "Player ID: " + strconv.Itoa(lastAction.playerId) + " Action: " + lastAction.input + " Direction: " + lastAction.direction
-	ebitenutil.DebugPrint(screen, outputString);
+	// Loop through players and output their inputs
+	for _, player := range g.PlayerManager.players {
+		for input, pressed := range player.Inputs.KeyPressed {
+			if(pressed) {
+				ebitenutil.DebugPrint(screen, "player " + strconv.Itoa(player.Id + 1) + "(" + player.Name + ") is pressing key " + input)
+			}
+		}
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -33,11 +32,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	setupAirconsoleInput()
+	playerManager := NewPlayerManager()
 
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(&Game{ PlayerManager: playerManager }); err != nil {
 		log.Fatal(err)
 	}
 }

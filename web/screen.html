@@ -27,7 +27,7 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
 <script type="text/javascript">
   // Set up some config 
   const minPlayers = 1;
-  const maxPlayers = 2;
+  const maxPlayers = 3;
 
   // Set up some variables for state
   let airconsole;
@@ -90,7 +90,7 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
         // Pass the action to the game via the JS/GO binding
         passInputToGame(playerId, data.input, data.direction);
 
-        console.log("Player: " + (playerId + 1) + " Action received: " + data.action + " Direction: " + data.direction);
+        console.log("Player: " + (playerId + 1) + " Action received: " + data.input + " Direction: " + data.direction);
         airconsole.message(from, "Action received!");
       }
     };
@@ -100,6 +100,9 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
   // Limits the number of active players to the maxPlayers amount
   // Sets the activePlayers array to the active player device IDs
   function handlePlayers() {
+    // Create copy of active players for comparison
+    var oldActivePlayers = activePlayers;
+
     var connectedControllers = airconsole.getControllerDeviceIds();
 
     let validPlayersCount = connectedControllers.length > maxPlayers
@@ -107,20 +110,42 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
             : airconsole.getControllerDeviceIds().length;
 
     airconsole.setActivePlayers(validPlayersCount);
+    
+    activePlayers = airconsole.getActivePlayerDeviceIds();    
 
-    activePlayers = airconsole.getActivePlayerDeviceIds();
+    // If the number of active players has changed, communicate this to the game
+    // This will currently always return the highest new/old player ID. 
+    // E.g. if player 1 disconnects, it will re-index them and communicate that player 2 left, and player 2 becomes player 1
+    // This is simply because of how airConsole getActivePlayerDeviceIds handles this. It will always re-index the player numbers for the device IDs.
+    // Not sure how airconsole expects us to handle this such that the players don't swap characters when one disconnects.
+    // Might have to implement some custom logic to handle this instead of using their solution.
+    if(oldActivePlayers.length !== activePlayers.length) {
+      var newPlayers = activePlayers.length - oldActivePlayers.length;
+      if(newPlayers > 0) {
+        for(playerId = activePlayers.length - newPlayers; playerId <= activePlayers.length; playerId++) {
+          deviceId = airconsole.convertPlayerNumberToDeviceId(playerId);
+          playerDetails = getPlayerDetails(deviceId);
+          playerConnectToGame(playerId, playerDetails.name);
+        }
+      } else if(newPlayers < 0){
+        removedPlayers = Math.abs(newPlayers);
+        for(playerId = oldActivePlayers.length - removedPlayers; playerId <= oldActivePlayers.length; playerId++) {
+          playerDisconnectFromGame(playerId); 
+        }
+      }
+    }
   }
 
   // Function to get player details from a device ID
   function getPlayerDetails(deviceId) {
-    let player = airconsole.convertDeviceIdToPlayerNumber(deviceId);
+    let playerId = airconsole.convertDeviceIdToPlayerNumber(deviceId);
     let name = airconsole.getNickname(deviceId);
     let profilePicture = airconsole.getProfilePicture(deviceId);
     let customData = airconsole.getCustomDeviceState(deviceId);
     let active = airconsole.getActivePlayerDeviceIds().includes(deviceId);
 
     return {
-      player: player,
+      playerId: playerId,
       name: name,
       profilePicture: profilePicture,
       customData: customData,

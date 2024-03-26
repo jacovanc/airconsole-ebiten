@@ -39,10 +39,12 @@
   // Perform logic based on if the controller is active (not just connected). A controller is not active when the screen has limited the number of players.
   // Can be used to show a message to the user that they can't play because there are too many players, or to show a message that they are player 1, 2, 3, etc.
   airconsole.onActivePlayersChange = function(playerId) {
-    var activePlayerDiv = document.getElementById("active-player");
-    var inactivePlayerDiv = document.getElementById("inactive-player");
-    var playerIdDiv = document.getElementById("playerId");
+    let activePlayerDiv = document.getElementById("active-player");
+    let inactivePlayerDiv = document.getElementById("inactive-player");
+    let playerIdDiv = document.getElementById("playerId");
 
+    let deviceId = airconsole.getActivePlayerDeviceId(playerId);
+    
     if (playerId !== undefined) {
       // If player is set, then this controller is active
       activePlayerDiv.style.display = "block";
