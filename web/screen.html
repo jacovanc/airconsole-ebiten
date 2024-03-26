@@ -69,10 +69,15 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
         initialized = true;
       }
 
+      // We might want to prevent this handlePlayers from being called while a game is active (not in the lobby)
+      // to prevent player index reshuffling while in-play (suddenly controlling another persons screen while playing is not great.)
       handlePlayers(); // This will set the number of active players, limited to the maxPlayers amount
     };
     airconsole.onDisconnect = function (deviceId) {
       // Here we can do any logic we want when a device disconnects, such as checking if the game should end.
+
+      // We might want to prevent this handlePlayers from being called while a game is active (not in the lobby)
+      // to prevent player index reshuffling while in-play (suddenly controlling another persons screen while playing is not great.)
       handlePlayers();
     };
 
@@ -123,14 +128,14 @@ WebAssembly.instantiateStreaming(fetch("build/game.wasm"), go.importObject).then
       var newPlayers = activePlayers.length - oldActivePlayers.length;
       if(newPlayers > 0) {
         for(playerId = activePlayers.length - newPlayers; playerId <= activePlayers.length; playerId++) {
-          deviceId = airconsole.convertPlayerNumberToDeviceId(playerId);
-          playerDetails = getPlayerDetails(deviceId);
-          playerConnectToGame(playerId, playerDetails.name);
+          controllerConnectToGame(playerId);
+          // In the future we will also need to update every player in the Go game to have the correct name
+          // Otherwise the name would get "taken along" when the players swap
         }
       } else if(newPlayers < 0){
         removedPlayers = Math.abs(newPlayers);
         for(playerId = oldActivePlayers.length - removedPlayers; playerId <= oldActivePlayers.length; playerId++) {
-          playerDisconnectFromGame(playerId); 
+          controllerDisconnectFromGame(playerId); 
         }
       }
     }

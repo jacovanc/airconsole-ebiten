@@ -8,84 +8,82 @@ type gameInputs struct {
 	KeyPressed map[string]bool
 }
 
-type Player struct {
+type Controller struct {
 	Id int
 	Name string
 	Inputs gameInputs
 }
 
-type PlayerManager struct {
-	players map[int]*Player
+type ControllerManager struct {
+	controllers map[int]*Controller
 }
 
-func NewPlayerManager() *PlayerManager {
-    pm := &PlayerManager{
-        players: make(map[int]*Player),
+func NewControllerManager() *ControllerManager {
+    cm := &ControllerManager{
+        controllers: make(map[int]*Controller),
     }
 
-	pm.setupAirconsoleInput()
+	cm.setupAirconsoleInput()
 
-	return pm
+	return cm
 }
 
-func (pm *PlayerManager) addPlayer(id int, name string) {
-	pm.players[id] = &Player{
+func (pm *ControllerManager) addController(id int) {
+	pm.controllers[id] = &Controller{
 		Id: id,
-		Name: name,
 		Inputs: gameInputs{
 			KeyPressed: make(map[string]bool),
 		},
 	}
 }
 
-func (pm *PlayerManager) removePlayer(playerId int) {
-	delete(pm.players, playerId)
+func (pm *ControllerManager) removeController(ControllerId int) {
+	delete(pm.controllers, ControllerId)
 }
 
-func (pm *PlayerManager) getPlayer(playerId int) *Player {
-	return pm.players[playerId]
+func (pm *ControllerManager) getController(ControllerId int) *Controller {
+	return pm.controllers[ControllerId]
 }
 
-func (pm *PlayerManager) setupAirconsoleInput() {
+func (pm *ControllerManager) setupAirconsoleInput() {
 	// Create a callback function for handling input passed from JS
 	js.Global().Set("passInputToGame", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if len(args) > 0 {
-			playerId := args[0].Int()
+			controllerId := args[0].Int()
 			input := args[1].String()
 			direction := args[2].String() // pressed or released
 
-			pm.updateInput(playerId, input, direction)
+			pm.updateInput(controllerId, input, direction)
 		}
 		return nil
 	}))
 
-	 // Handle player connect
-	 js.Global().Set("playerConnectToGame", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	// Handle Controller connect
+	js.Global().Set("controllerConnectToGame", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
         if len(args) > 0 {
-            playerId := args[0].Int()
-			name := args[1].String()
-            pm.addPlayer(playerId, name)
+            controllerId := args[0].Int()
+            pm.addController(controllerId)
         }
         return nil
     }))
 
-    // Handle player disconnect
-    js.Global().Set("playerDisconnectFromGame", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+    // Handle Controller disconnect
+    js.Global().Set("controllerDisconnectFromGame", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
         if len(args) > 0 {
-            playerId := args[0].Int()
-            pm.removePlayer(playerId)
+            controllerId := args[0].Int()
+            pm.removeController(controllerId)
         }
         return nil
     }))
 }
 
-func (pm *PlayerManager) updateInput(playerId int, input, direction string) {
-	// Check if playerInputs already exists for the playerId
-	pl := pm.getPlayer(playerId)
+func (pm *ControllerManager) updateInput(controllerId int, input, direction string) {
+	// Check if ControllerInputs already exists for the ControllerId
+	pl := pm.getController(controllerId)
 	if pl == nil {
-		panic("Player not found. Can't assume player exists as we won't have their details like name.")
-		// pm.addPlayer(playerId)
-		// pl = pm.getPlayer(playerId)
+		panic("Controller not found. Can't assume Controller exists as we won't have their details like name.")
+		// pm.addController(ControllerId)
+		// pl = pm.getController(ControllerId)
 	}
 
 	// Update the gameInput struct with the input
