@@ -4,6 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -56,7 +57,7 @@ func main() {
 	// controllerManager.addController(0) // Dev only
 
 	// Sleep for a few seconds to allow the controller to connect
-	// time.Sleep(5 * time.Second)
+	time.Sleep(5 * time.Second)
 	
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Hello, World!")
