@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -28,16 +26,22 @@ func (c *playerCollisionComponent) onDraw(screen *ebiten.Image) error {
 
 func (c *playerCollisionComponent) onCollision(otherEntity *entity) error {
 	// If otherEntity.tags array contains "platform"
-	fmt.Println("Player collided with platform")
 	for _, tag := range otherEntity.tags {
+
 		if tag == "platform" {
-			playerJumpComponent := c.entity.getComponent("playerJumpComponent").(*playerJumpComponent)
-			if playerJumpComponent != nil {
+			if playerJumpComponent := c.entity.getComponent("playerJumpComponent").(*playerJumpComponent); playerJumpComponent != nil {
 				// Don't do anything if the player is not falling
-				if playerJumpComponent.velocity <= 0 {
-					// Trigger the jump
-					playerJumpComponent.velocity = playerJumpComponent.jumpSpeed
+				if playerJumpComponent.velocity > 0 {
+					return nil
 				}
+
+				// If the the bottom of the player is lower than the bottom of the platform, don't do anything
+				if c.entity.position.y < otherEntity.position.y {
+					return nil
+				}
+
+				// Trigger the jump
+				playerJumpComponent.velocity = playerJumpComponent.jumpSpeed
 			}
 		}
 	}
