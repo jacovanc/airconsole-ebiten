@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -17,6 +19,10 @@ func (c *inputComponent) uniqueName() string {
 
 func (c *inputComponent) onUpdate() error {
 	controller := c.controllerManager.getController(c.controllerId)
+	if controller == nil {
+		fmt.Println("Controller not found")
+		return nil
+	}
 	if(controller.Inputs.KeyPressed["left"]) {
 		c.entity.position.x -= float64(c.speed)
 	}
