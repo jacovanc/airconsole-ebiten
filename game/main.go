@@ -16,7 +16,7 @@ type Game struct{
 
 func (g *Game) Update() error {
 	// For easy development we can use the arrow keys to control player 1 - but this essentially disables the airconsole controller
-	overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
+	// overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
 
 	// Check all collisions
 	checkCollisions(g.entities)
@@ -53,7 +53,7 @@ func main() {
 	controllerManager := newControllerManager()
 
 	// Create a controller for player 1 so that we can overwrite the controller with arrow keys, even if the controller is not connected
-	controllerManager.addController(0) // Dev only
+	// controllerManager.addController(0) // Dev only
 
 	// Sleep for a few seconds to allow the controller to connect
 	// time.Sleep(5 * time.Second)
