@@ -13,14 +13,12 @@ func (c *playerJumpComponent) uniqueName() string {
 }
 
 func (c *playerJumpComponent) onUpdate() error {
-	if c.player.position.y > 0 {
-		c.velocity -= 0.1
-	} else {
-		c.player.position.y = 0
-		c.velocity = c.jumpSpeed
-	}
-
 	c.player.position.y += c.velocity
+
+	c.velocity -= 0.1
+	if c.velocity < -c.jumpSpeed { // If the player is falling too fast, limit the speed
+		c.velocity = -c.jumpSpeed
+	}
 
 	return nil
 }

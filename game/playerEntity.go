@@ -23,7 +23,7 @@ func newPlayerEntity(position vector, controllerManager *controllerManager) *ent
 
 	jumpComponent := &playerJumpComponent{
 		player:    player,
-		velocity:  0,
+		velocity:  playerJumpSpeed, // Start jumping immediately
 		jumpSpeed: playerJumpSpeed,
 	}
 
@@ -43,7 +43,7 @@ func newPlayerEntity(position vector, controllerManager *controllerManager) *ent
 	player.addComponent(inputComponent)
 	player.addComponent(collisionComponent)
 
-	player.addCollision(rectangle{position: position, width: playerWidth, height: playerHeight})
+	player.addCollision(rectangle{position: player.position, width: playerWidth, height: playerHeight})
 
 	return player
 }
