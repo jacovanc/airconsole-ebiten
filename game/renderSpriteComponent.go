@@ -9,6 +9,8 @@ import (
 
 type renderSpriteComponent struct {
 	entity    *entity
+	width	 int
+	height	 int
 }
 
 func (c *renderSpriteComponent) uniqueName() string {
@@ -20,6 +22,10 @@ func (c *renderSpriteComponent) onUpdate() error {
 }
 
 func (c *renderSpriteComponent) onDraw(screen *ebiten.Image) error {
-	ebitenutil.DrawRect(screen, c.entity.position.x, c.entity.position.y, 16, 16, color.White)
+	ebitenutil.DrawRect(screen, c.entity.position.x, c.entity.position.y, float64(c.width), float64(c.height), color.White)
+	return nil
+}
+
+func (c *renderSpriteComponent) onCollision(otherEntity *entity) error {
 	return nil
 }

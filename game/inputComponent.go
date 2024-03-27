@@ -33,3 +33,7 @@ func (c *inputComponent) onUpdate() error {
 func (c *inputComponent) onDraw(screen *ebiten.Image) error {
 	return nil
 }
+
+func (c *inputComponent) onCollision(otherEntity *entity) error {
+	return nil
+}

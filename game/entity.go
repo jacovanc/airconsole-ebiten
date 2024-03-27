@@ -7,22 +7,29 @@ import (
 type entity struct {
 	position vector
 	components []component
+	collisions []rectangle
+	tags []string
 }
 
 type vector struct {
 	x, y float64
 }
 
+type rectangle struct {
+	position vector
+	width, height float64
+}
+
 type component interface {
 	onUpdate() error
-	onDraw(screen *ebiten.Image) error
-
+	onDraw(*ebiten.Image) error
+	onCollision(*entity) error
 	// A unique name identifier of this component to ensure that
 	// there are no duplicates, without using reflection
 	uniqueName() string 
 }
 
-func (e *entity) onUpdate() error {
+func (e *entity) update() error {
 	for _, component := range e.components {
 		if err := component.onUpdate(); err != nil {
 			return err
@@ -31,9 +38,18 @@ func (e *entity) onUpdate() error {
 	return nil
 }
 
-func (e *entity) onDraw(screen *ebiten.Image) error {
+func (e *entity) draw(screen *ebiten.Image) error {
 	for _, component := range e.components {
 		if err := component.onDraw(screen); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (e *entity) collision(otherEntity *entity) error {
+	for _, component := range e.components {
+		if err := component.onCollision(otherEntity); err != nil {
 			return err
 		}
 	}
@@ -59,6 +75,10 @@ func (e *entity) getComponent(uniqueName string) component {
 		}
 	}
 	return nil
+}
+
+func (e *entity) addCollision(rectangle rectangle) {
+	e.collisions = append(e.collisions, rectangle)
 }
 
 

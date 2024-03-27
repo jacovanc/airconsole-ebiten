@@ -3,17 +3,22 @@ package main
 const (
 	playerSpeed     = 2
 	playerJumpSpeed = 5
-	playerSize      = 16
+	playerWidth     = 16
+	playerHeight    = 16
 )
 
 func newPlayerEntity(position vector, controllerManager *controllerManager) *entity {
 	player := &entity{
 		position:   position,
 		components: []component{},
+		collisions: []rectangle{},
+		tags:       []string{"player"},
 	}
 
 	renderSpriteComponent := &renderSpriteComponent{
 		entity: player,
+		width:  playerWidth,
+		height: playerHeight,
 	}
 
 	jumpComponent := &playerJumpComponent{
@@ -29,9 +34,16 @@ func newPlayerEntity(position vector, controllerManager *controllerManager) *ent
 		controllerManager: controllerManager,
 	}
 
+	collisionComponent := &playerCollisionComponent{
+		entity: player,
+	}
+
 	player.addComponent(renderSpriteComponent)
 	player.addComponent(jumpComponent)
 	player.addComponent(inputComponent)
+	player.addComponent(collisionComponent)
+
+	player.addCollision(rectangle{position: position, width: playerWidth, height: playerHeight})
 
 	return player
 }

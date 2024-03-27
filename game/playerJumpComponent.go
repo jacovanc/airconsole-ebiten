@@ -28,3 +28,7 @@ func (c *playerJumpComponent) onUpdate() error {
 func (c *playerJumpComponent) onDraw(screen *ebiten.Image) error {
 	return nil
 }
+
+func (c *playerJumpComponent) onCollision(otherEntity *entity) error {
+	return nil
+}
