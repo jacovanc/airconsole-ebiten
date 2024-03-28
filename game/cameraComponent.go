@@ -9,7 +9,6 @@ import (
 
 type cameraComponent struct {
 	cameraEntity *entity
-	targetEntity *entity
 	// Viewport is a box that defines the camera's view. 
 	// The position is where it is drawn on the screen, and the box is the size of the view. 
 	// The size also affects calculation determining which entities are in view - even though it is the parent entity position that follows the player.
@@ -21,10 +20,6 @@ func (c *cameraComponent) uniqueName() string {
 }
 
 func (c *cameraComponent) onUpdate() error {
-	// Follow the target, centered on the viewport
-	// c.cameraEntity.position.x = c.targetEntity.position.x - c.viewPort.box.width / 2
-	c.cameraEntity.position.y = c.targetEntity.position.y - c.viewPort.box.height / 2
-
 	return nil
 }
 

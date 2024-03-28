@@ -9,13 +9,22 @@ func newCameraEntity(target *entity) *entity {
 		tags:       []string{"camera"},
 	}
 
+	cameraViewport := collisionBox{
+		position: vector{x: 50, y: 50},
+		box:      rectangle{width: levelWidth, height: 400},
+	}
+
 	camera.addComponent(&cameraComponent{
 		cameraEntity: camera,
-		targetEntity: target,
-		viewPort: collisionBox{
-			position: vector{x: 50, y: 50},
-			box:      rectangle{width: levelWidth, height: 400},
-		},
+		viewPort:     cameraViewport,
+	})
+
+	camera.addComponent(&cameraFollowComponent{
+		cameraEntity:       camera,
+		targetEntity:       target,
+		viewPort:           cameraViewport,
+		distanceFromTop:    cameraViewport.box.height / 2,
+		distanceFromBottom: cameraViewport.box.height / 5,
 	})
 
 	return camera
