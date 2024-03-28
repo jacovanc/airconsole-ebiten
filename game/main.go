@@ -17,7 +17,7 @@ type Game struct{
 
 func (g *Game) Update() error {
 	// For easy development we can use the arrow keys to control player 1 - but this essentially disables the airconsole controller
-	// overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
+	overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
 
 	// Check all collisions
 	checkCollisions(g.entities)
@@ -54,7 +54,7 @@ func main() {
 	controllerManager := newControllerManager()
 
 	// Create a controller for player 1 so that we can overwrite the controller with arrow keys, even if the controller is not connected
-	// controllerManager.addController(0) // Dev only
+	controllerManager.addController(0) // Dev only
 
 	// Sleep for a few seconds to allow the controller to connect
 	time.Sleep(5 * time.Second)
@@ -69,7 +69,7 @@ func main() {
 	// // Viewport should not follow player 1 downwards when the player is close to the bottom of the screen - player can fall off the bottom of the screen
 
 	// Create player 1
-	player1 := newPlayerEntity(vector{x: 100, y: 50}, controllerManager)
+	player1 := newPlayerEntity(vector{x: 100, y: 400}, controllerManager)
 	entities = append(entities, player1)
 
 	// Viewports and players should be implemented such that we can add more players with their own viewports

@@ -31,17 +31,17 @@ func (c *playerCollisionComponent) onCollision(otherEntity *entity) error {
 		if tag == "platform" {
 			if playerJumpComponent := c.entity.getComponent("playerJumpComponent").(*playerJumpComponent); playerJumpComponent != nil {
 				// Don't do anything if the player is not falling
-				if playerJumpComponent.velocity > 0 {
+				if playerJumpComponent.velocity < 0 {
 					return nil
 				}
 
 				// If the the bottom of the player is lower than the bottom of the platform, don't do anything
-				if c.entity.position.y < otherEntity.position.y {
+				if c.entity.position.y - float64(playerHeight) > otherEntity.position.y - float64(platformHeight) {
 					return nil
 				}
 
 				// Trigger the jump
-				playerJumpComponent.velocity = playerJumpComponent.jumpSpeed
+				playerJumpComponent.velocity = -playerJumpComponent.jumpSpeed
 			}
 		}
 	}
