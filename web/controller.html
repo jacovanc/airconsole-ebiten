@@ -12,17 +12,16 @@
   <div id="active-player">
 
     <!-- We can define different screens which can be changed from the game code -->
-    <div id="screen-lobby">
+    <div class="fullscreen" id="screen-lobby">
       <!-- Each screen can have different actions and displays -->
-      <button class="input" id="action-1">Action 1</button>
-      <button class="input" id="action-2">Action 2</button>
+      <button class="input" id="left">left</button>
+      <button class="input" id="right">right</button>
     </div>
 
-    <div id="screen-game">
-      <!-- Each screen can have different actions and displays -->
+    <!-- <div class="fullscreen" id="screen-game">
       <button class="input" id="action-3">Action 3</button>
       <button class="input" id="action-4">Action 4</button>
-    </div>
+    </div> -->
   </div>
 
   <div id="inactive-player">
@@ -39,10 +38,10 @@
   // Perform logic based on if the controller is active (not just connected). A controller is not active when the screen has limited the number of players.
   // Can be used to show a message to the user that they can't play because there are too many players, or to show a message that they are player 1, 2, 3, etc.
   airconsole.onActivePlayersChange = function(playerId) {
-    var activePlayerDiv = document.getElementById("active-player");
-    var inactivePlayerDiv = document.getElementById("inactive-player");
-    var playerIdDiv = document.getElementById("playerId");
-
+    let activePlayerDiv = document.getElementById("active-player");
+    let inactivePlayerDiv = document.getElementById("inactive-player");
+    let playerIdDiv = document.getElementById("playerId");
+    
     if (playerId !== undefined) {
       // If player is set, then this controller is active
       activePlayerDiv.style.display = "block";
@@ -107,3 +106,37 @@
     }
   };
 </script>
+
+<style>
+  /* Style for the container of the buttons */
+#active-player {
+    width: 100%;
+    height: 100vh; /* Use full viewport height */
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.fullscreen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+/* Style for each button */
+.input {
+    width: 50%; /* Each button takes up half the width */
+    height: 100%; /* Full height */
+    font-size: 2em; /* Larger font for better visibility */
+    flex-grow: 1; /* Ensures buttons fill the horizontal space */
+}
+
+/* Additional styles for specific buttons */
+#left, #right {
+    background-color: #4CAF50; /* Example color, change as needed */
+    color: white;
+    border: none;
+    outline: none;
+}
+</style>
