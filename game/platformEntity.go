@@ -8,6 +8,7 @@ const (
 func newPlatformEntity(position vector) *entity {
 	platform := &entity{
 		position:   position,
+		dimensions: rectangle{width: platformWidth, height: platformHeight},
 		components: []component{},
 		collisions: []collisionBox{},
 		tags:       []string{"platform"},

@@ -32,7 +32,7 @@ func (c *inputComponent) onUpdate() error {
 	return nil
 }
 
-func (c *inputComponent) onDraw(screen *ebiten.Image, offset vector) error {
+func (c *inputComponent) onDraw(screen *ebiten.Image, camera *cameraComponent) error {
 	return nil
 }
 

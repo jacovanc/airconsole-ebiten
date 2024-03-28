@@ -28,7 +28,7 @@ func (c *playerJumpComponent) onUpdate() error {
 	return nil
 }
 
-func (c *playerJumpComponent) onDraw(screen *ebiten.Image, offset vector) error {
+func (c *playerJumpComponent) onDraw(screen *ebiten.Image, camera *cameraComponent) error {
 	return nil
 }
 

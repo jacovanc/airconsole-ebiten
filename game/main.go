@@ -10,6 +10,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
+const (
+	levelWidth  = 250
+)
+
 type Game struct{
 	controllerManager *controllerManager
 	entities []*entity
@@ -54,13 +58,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Draw entities in a camera view
 	for _, camera := range g.cameras {
 		// Draw the camera view
-		camera.draw(screen, vector{x: 0, y: 0})
 		cameraComponent := camera.getComponent("cameraComponent").(*cameraComponent)
-		offset := vector{x: camera.position.x, y: camera.position.y}
-
+		camera.draw(screen, nil)
 		for _, entity := range g.entities {
 			if cameraComponent != nil && cameraComponent.isInView(entity) {
-				entity.draw(screen, offset)
+				entity.draw(screen, cameraComponent)
 			}
 		}
 	}
@@ -90,7 +92,7 @@ func main() {
 	// // Viewport should not follow player 1 downwards when the player is close to the bottom of the screen - player can fall off the bottom of the screen
 
 	// Create player 1
-	player1 := newPlayerEntity(vector{x: 100, y: 400}, controllerManager)
+	player1 := newPlayerEntity(vector{x: levelWidth / 2, y: 400}, controllerManager)
 	entities = append(entities, player1)
 
 	// Platform guaranteed to be below the player on spawn
@@ -98,13 +100,20 @@ func main() {
 	entities = append(entities, platform)
 
 	// Create a platform pool (maybe like 100)
-	xPos := 100
+	previousXPos := 0
 	for i := 0; i < 100; i++ {
-		yPos := -(i * 100) + 1000 // Offset the platforms by 1000 so that they start below the player not above
+		xPos := rand.Intn(levelWidth - platformWidth) // Don't place a platform outside the level width
+		// Ensure that xPos is within 200 pixels previous platform
+		if(i > 0) {
+			if(xPos < previousXPos - 150) {
+				xPos = previousXPos - 150
+			}
+			if(xPos > previousXPos + 150) {
+				xPos = previousXPos + 150
+			}
+		}
 
-		// Random number between -50 and 50
-		randomNumber := rand.Intn(101) - 50
-		xPos += randomNumber
+		yPos := -(i * 100) + 1000 // Offset the platforms by 1000 so that they start below the player not above
 
 		// Limit xPos to be between 0 and 640
 		if(xPos < 0) {

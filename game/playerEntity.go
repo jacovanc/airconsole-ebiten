@@ -10,6 +10,7 @@ const (
 func newPlayerEntity(position vector, controllerManager *controllerManager) *entity {
 	player := &entity{
 		position:   position,
+		dimensions: rectangle{width: playerWidth, height: playerHeight},
 		components: []component{},
 		collisions: []collisionBox{},
 		tags:       []string{"player"},

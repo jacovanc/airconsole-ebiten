@@ -6,6 +6,7 @@ import (
 
 type entity struct {
 	position vector
+	dimensions rectangle
 	components []component
 	collisions []collisionBox
 	tags []string
@@ -25,7 +26,7 @@ type collisionBox struct {
 }
 type component interface {
 	onUpdate() error
-	onDraw(*ebiten.Image, vector) error
+	onDraw(*ebiten.Image, *cameraComponent) error // CameraComponent can be passed in to handle camera offset and viewport. Can be nil.
 	onCollision(*entity) error
 	// A unique name identifier of this component to ensure that
 	// there are no duplicates, without using reflection
@@ -42,9 +43,9 @@ func (e *entity) update() error {
 }
 
 // Offset handles the camera offset to ensure we render it inside the camera viewport
-func (e *entity) draw(screen *ebiten.Image, offset vector) error {
+func (e *entity) draw(screen *ebiten.Image, camera *cameraComponent) error {
 	for _, component := range e.components {
-		if err := component.onDraw(screen, offset); err != nil {
+		if err := component.onDraw(screen, camera); err != nil {
 			return err
 		}
 	}

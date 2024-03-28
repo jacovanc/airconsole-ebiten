@@ -20,7 +20,7 @@ func (c *playerCollisionComponent) onUpdate() error {
 	return nil
 }
 
-func (c *playerCollisionComponent) onDraw(screen *ebiten.Image, offset vector) error {
+func (c *playerCollisionComponent) onDraw(screen *ebiten.Image, camera *cameraComponent) error {
 	return nil
 }
 
