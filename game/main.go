@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 type Game struct{
 	controllerManager *controllerManager
 	entities []*entity
+	cameras []*entity
 }
 
 func (g *Game) Update() error {
@@ -22,6 +24,15 @@ func (g *Game) Update() error {
 	// Check all collisions
 	checkCollisions(g.entities)
 
+	// Update cameras
+	for _, camera := range g.cameras {
+		err := camera.update()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Update all entities
 	for _, entity := range g.entities {
 		err := entity.update()
 		if err != nil {
@@ -41,8 +52,21 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		}
 	}
 
-	for _, entity := range g.entities {
-		entity.draw(screen)
+	// Draw entities in a camera view
+	for i, camera := range g.cameras {
+		fmt.Println("Drawing from camera ", i)
+		// Draw the camera view
+		camera.draw(screen, vector{x: 0, y: 0})
+		cameraComponent := camera.getComponent("cameraComponent").(*cameraComponent)
+		offset := vector{x: camera.position.x, y: camera.position.y}
+
+		for _, entity := range g.entities {
+			fmt.Println("Drawing entity")
+			if cameraComponent != nil && cameraComponent.isInView(entity) {
+				fmt.Println("Drawing entity in view")
+				entity.draw(screen, offset)
+			}
+		}
 	}
 }
 
@@ -63,6 +87,7 @@ func main() {
 	ebiten.SetWindowTitle("Hello, World!")
 
 	entities := []*entity{}
+	cameras := []*entity{}
 
 	// Create a viewport for player 1
 	// // Viewport should follow player 1 upwards when the player is close to the top of the screen
@@ -71,8 +96,6 @@ func main() {
 	// Create player 1
 	player1 := newPlayerEntity(vector{x: 100, y: 400}, controllerManager)
 	entities = append(entities, player1)
-
-	// Viewports and players should be implemented such that we can add more players with their own viewports
 
 	// Create a platform pool (maybe like 100)
 	xPos := 100
@@ -98,9 +121,13 @@ func main() {
 	// // Platforms should be able to be recycled when they are off below the lowest viewport by a certain amount
 	// // Platforms should be added above the viewport when the highest platform is below a certain distance above the highest view port (ensure we always have platforms above the viewport)
 
+	player1Camera := newCameraEntity(player1)
+	cameras = append(cameras, player1Camera)
+
 	if err := ebiten.RunGame(&Game{ 
 		controllerManager: controllerManager,
 		entities: entities,
+		cameras: cameras,
 	}); err != nil {
 		log.Fatal(err)
 	}

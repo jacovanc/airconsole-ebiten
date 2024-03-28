@@ -9,12 +9,12 @@ func newPlatformEntity(position vector) *entity {
 	platform := &entity{
 		position:   position,
 		components: []component{},
-		collisions: []rectangle{},
+		collisions: []collisionBox{},
 		tags:       []string{"platform"},
 	}
 	platform.addComponent(&renderSpriteComponent{entity: platform, width: platformWidth, height: platformHeight})
 
-	platform.addCollision(rectangle{position: position, width: 32, height: 10})
+	platform.addCollision(collisionBox{position: position, box: rectangle{width: platformWidth, height: platformHeight}})
 
 	return platform
 }

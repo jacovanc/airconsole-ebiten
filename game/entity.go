@@ -7,7 +7,7 @@ import (
 type entity struct {
 	position vector
 	components []component
-	collisions []rectangle
+	collisions []collisionBox
 	tags []string
 }
 
@@ -16,13 +16,16 @@ type vector struct {
 }
 
 type rectangle struct {
-	position vector
 	width, height float64
 }
 
+type collisionBox struct {
+	position vector
+	box rectangle
+}
 type component interface {
 	onUpdate() error
-	onDraw(*ebiten.Image) error
+	onDraw(*ebiten.Image, vector) error
 	onCollision(*entity) error
 	// A unique name identifier of this component to ensure that
 	// there are no duplicates, without using reflection
@@ -38,9 +41,10 @@ func (e *entity) update() error {
 	return nil
 }
 
-func (e *entity) draw(screen *ebiten.Image) error {
+// Offset handles the camera offset to ensure we render it inside the camera viewport
+func (e *entity) draw(screen *ebiten.Image, offset vector) error {
 	for _, component := range e.components {
-		if err := component.onDraw(screen); err != nil {
+		if err := component.onDraw(screen, offset); err != nil {
 			return err
 		}
 	}
@@ -77,8 +81,8 @@ func (e *entity) getComponent(uniqueName string) component {
 	return nil
 }
 
-func (e *entity) addCollision(rectangle rectangle) {
-	e.collisions = append(e.collisions, rectangle)
+func (e *entity) addCollision(collisionBox collisionBox) {
+	e.collisions = append(e.collisions, collisionBox)
 }
 
 

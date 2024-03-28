@@ -31,7 +31,7 @@ func (c *playerJumpComponent) onUpdate() error {
 	return nil
 }
 
-func (c *playerJumpComponent) onDraw(screen *ebiten.Image) error {
+func (c *playerJumpComponent) onDraw(screen *ebiten.Image, offset vector) error {
 	return nil
 }
 

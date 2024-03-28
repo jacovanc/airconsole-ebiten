@@ -11,7 +11,7 @@ func newPlayerEntity(position vector, controllerManager *controllerManager) *ent
 	player := &entity{
 		position:   position,
 		components: []component{},
-		collisions: []rectangle{},
+		collisions: []collisionBox{},
 		tags:       []string{"player"},
 	}
 
@@ -43,7 +43,7 @@ func newPlayerEntity(position vector, controllerManager *controllerManager) *ent
 	player.addComponent(inputComponent)
 	player.addComponent(collisionComponent)
 
-	player.addCollision(rectangle{position: player.position, width: playerWidth, height: playerHeight})
+	player.addCollision(collisionBox{position: player.position, box: rectangle{width: playerWidth, height: playerHeight}})
 
 	return player
 }

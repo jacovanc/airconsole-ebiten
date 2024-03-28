@@ -23,9 +23,9 @@ func checkCollisions(entities []*entity) error {
 	return nil
 }
 
-func collides(c1, c2 rectangle) bool {
-	return c1.position.x+c1.width >= c2.position.x &&
-		c1.position.x <= c2.position.x+c2.width &&
-		c1.position.y+c1.height >= c2.position.y &&
-		c1.position.y <= c2.position.y+c2.height
+func collides(c1, c2 collisionBox) bool {
+	return c1.position.x+c1.box.width >= c2.position.x &&
+		c1.position.x <= c2.position.x+c2.box.width &&
+		c1.position.y+c1.box.height >= c2.position.y &&
+		c1.position.y <= c2.position.y+c2.box.height
 }
