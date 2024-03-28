@@ -2,7 +2,7 @@ package main
 
 const (
 	playerSpeed     = 2
-	playerJumpSpeed = 5
+	playerJumpSpeed = 6
 	playerWidth     = 16
 	playerHeight    = 16
 )

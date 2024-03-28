@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -18,12 +16,11 @@ func (c *playerJumpComponent) uniqueName() string {
 }
 
 func (c *playerJumpComponent) onUpdate() error {
-	fmt.Println("Velcity: ", c.velocity)
 	c.player.position.y += c.velocity
 
-	c.velocity += 0.1
-	if c.velocity > c.jumpSpeed { // If the player is falling too fast, limit the speed
-		c.velocity = c.jumpSpeed
+	c.velocity += 0.15
+	if c.velocity > c.jumpSpeed*3 { // If the player is falling too fast, limit the speed
+		c.velocity = c.jumpSpeed*3
 	}
 
 	// Jumps are triggered in the playerCollisionComponent

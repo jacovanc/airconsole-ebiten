@@ -7,7 +7,7 @@ const (
 
 func newCameraEntity(target *entity) *entity {
 	camera := &entity{
-		position:   vector{x: 0, y: 0},
+		position:   vector{x: 0, y: 0}, // Doesn't matter, will be set by the camera component to follow the target
 		components: []component{},
 		collisions: []collisionBox{},
 		tags:       []string{"camera"},

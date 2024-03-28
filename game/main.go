@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -53,17 +52,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 
 	// Draw entities in a camera view
-	for i, camera := range g.cameras {
-		fmt.Println("Drawing from camera ", i)
+	for _, camera := range g.cameras {
 		// Draw the camera view
 		camera.draw(screen, vector{x: 0, y: 0})
 		cameraComponent := camera.getComponent("cameraComponent").(*cameraComponent)
 		offset := vector{x: camera.position.x, y: camera.position.y}
 
 		for _, entity := range g.entities {
-			fmt.Println("Drawing entity")
 			if cameraComponent != nil && cameraComponent.isInView(entity) {
-				fmt.Println("Drawing entity in view")
 				entity.draw(screen, offset)
 			}
 		}
@@ -97,10 +93,14 @@ func main() {
 	player1 := newPlayerEntity(vector{x: 100, y: 400}, controllerManager)
 	entities = append(entities, player1)
 
+	// Platform guaranteed to be below the player on spawn
+	platform := newPlatformEntity(vector{x: 100, y: 500})
+	entities = append(entities, platform)
+
 	// Create a platform pool (maybe like 100)
 	xPos := 100
-	for i := 0; i < 10; i++ {
-		yPos := i * 100
+	for i := 0; i < 100; i++ {
+		yPos := -(i * 100) + 1000 // Offset the platforms by 1000 so that they start below the player not above
 
 		// Random number between -50 and 50
 		randomNumber := rand.Intn(101) - 50

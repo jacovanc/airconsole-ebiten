@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,7 +10,10 @@ import (
 type cameraComponent struct {
 	cameraEntity *entity
 	targetEntity *entity
-	viewPort collisionBox // Reuse this for now although the name is misleading, it has what we need
+	// Viewport is a box that defines the camera's view. 
+	// The position is where it is drawn on the screen, and the box is the size of the view. 
+	// The size also affects calculation determining which entities are in view - even though it is the parent entity position that follows the player.
+	viewPort collisionBox 
 }
 
 func (c *cameraComponent) uniqueName() string {
@@ -39,9 +41,6 @@ func (c *cameraComponent) onCollision(otherEntity *entity) error {
 }
 
 func (c *cameraComponent) isInView(entity *entity) bool {
-	fmt.Println("Checking if entity is in view")
-	fmt.Println("Entity position: ", entity.position)
-	fmt.Println("Camera position: ", c.cameraEntity.position, " Viewport width and height: ", c.viewPort.box.width, c.viewPort.box.height)
 	// Check if the entity is in the camera's view
 	if entity.position.x > c.cameraEntity.position.x && entity.position.x < c.cameraEntity.position.x + c.viewPort.box.width &&
 		entity.position.y > c.cameraEntity.position.y && entity.position.y < c.cameraEntity.position.y + c.viewPort.box.height {
