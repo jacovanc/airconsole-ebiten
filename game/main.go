@@ -16,9 +16,9 @@ import (
 	"github.com/jacovanc/airconsole-ebiten/game/interfaces"
 	"github.com/jacovanc/airconsole-ebiten/game/shapes"
 
-	"net/http"
 	_ "net/http/pprof"
 )
+
 
 const (
 	levelWidth  = 250
@@ -30,9 +30,18 @@ type Game struct{
 	controllerManager *controllers.ControllerManager
 	entitiesArray []interfaces.Entity
 	camerasArray []interfaces.Entity
+
+	// Benchmarking
+	updateAccumulatedTime time.Duration
+    drawAccumulatedTime   time.Duration
+    frameCount            int
+	frameThreshold		 int
 }
 
 func (g *Game) Update() error {
+	// Benchmarking
+	startTime := time.Now()
+
 	// For easy development we can use the arrow keys to control player 1 - but this essentially disables the airconsole controller
 	overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
 
@@ -54,10 +63,25 @@ func (g *Game) Update() error {
 			return err
 		}
 	}
+
+	// Benchmarking
+	elapsedTime := time.Since(startTime)
+	g.updateAccumulatedTime += elapsedTime
+	g.frameCount++
+
+	if g.frameCount >= g.frameThreshold {
+		log.Printf("Total update accumulated time: %v ms\n", g.updateAccumulatedTime.Milliseconds())
+		g.updateAccumulatedTime = 0 // Reset the accumulated time
+		g.frameCount = 0 // Reset the frame count
+	}
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	// Benchmarking
+	startTime := time.Now()
+
 	// Loop through players and output their inputs
 	for _, controller := range g.controllerManager.Controllers {
 		for input, pressed := range controller.Inputs.KeyPressed {
@@ -78,6 +102,16 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			}
 		}
 	}
+
+	// Benchmarking
+	elapsedTime := time.Since(startTime)
+	g.drawAccumulatedTime += elapsedTime
+
+	if g.frameCount >= g.frameThreshold {
+		log.Printf("Total draw accumulated time: %v ms\n", g.drawAccumulatedTime.Milliseconds())
+		g.drawAccumulatedTime = 0 // Reset the accumulated time
+		// No need to reset g.frameCount here, as it's done in Update
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -85,10 +119,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
-	
 	controllerManager := controllers.NewControllerManager()
 
 	// Create a controller for player 1 so that we can overwrite the controller with arrow keys, even if the controller is not connected
@@ -153,6 +183,9 @@ func main() {
 		controllerManager: controllerManager,
 		entitiesArray: entitiesArray,
 		camerasArray: camerasArray,
+
+		// Benchmarking
+		frameThreshold: 100,
 	}); err != nil {
 		log.Fatal(err)
 	}
