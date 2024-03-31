@@ -1,14 +1,12 @@
 package components
 
 import (
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"github.com/jacovanc/airconsole-ebiten/game/interfaces"
 	"github.com/jacovanc/airconsole-ebiten/game/shapes"
 )
 
 type CameraFollowComponent struct {
-	CameraEntity interfaces.Entity
+	*DefaultComponent
 	TargetEntity interfaces.Entity
 	// Viewport is a box that defines the camera's view. 
 	// The position is where it is drawn on the screen, and the box is the size of the view. 
@@ -27,7 +25,7 @@ func (c *CameraFollowComponent) OnUpdate() error {
 	velocity := c.TargetEntity.GetComponent("playerJumpComponent").(*PlayerJumpComponent).Velocity
 
 	targetPosition := c.TargetEntity.GetPosition()
-	cameraPosition := c.CameraEntity.GetPosition()
+	cameraPosition := c.Entity.GetPosition()
 	
 	// Only follow if near the top or bottom of the viewport
 	// if c.targetEntity.position.y < c.cameraEntity.position.y + c.distanceFromTop && velocity < 0 {
@@ -47,16 +45,4 @@ func (c *CameraFollowComponent) OnUpdate() error {
 	}
 
 	return nil
-}
-
-func (c *CameraFollowComponent) OnDraw(screen *ebiten.Image, camera interfaces.CameraComponent) error {
-	return nil
-}
-
-func (c *CameraFollowComponent) OnCollision(otherEntity interfaces.Entity) error {
-	return nil
-}
-
-func (c *CameraFollowComponent) GetEntity() interfaces.Entity {
-	return c.CameraEntity
 }

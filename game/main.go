@@ -185,7 +185,7 @@ func main() {
 		camerasArray: camerasArray,
 
 		// Benchmarking
-		frameThreshold: 100,
+		frameThreshold: 1000,
 	}); err != nil {
 		log.Fatal(err)
 	}

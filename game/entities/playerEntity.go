@@ -24,26 +24,35 @@ func NewPlayerEntity(position shapes.Vector, controllerManager *controllers.Cont
 	}
 
 	renderSpriteComponent := &components.RenderSpriteComponent{
-		Entity: player,
+		DefaultComponent: &components.DefaultComponent{
+			Entity: player,
+		},
 		Width:  playerWidth,
 		Height: playerHeight,
 	}
 
 	jumpComponent := &components.PlayerJumpComponent{
-		Player:    player,
+		DefaultComponent: &components.DefaultComponent{
+			Entity: player,
+		},
 		Velocity:  playerJumpSpeed, // Start jumping immediately
 		JumpSpeed: playerJumpSpeed,
 	}
 
 	inputComponent := &components.InputComponent{
+		DefaultComponent: &components.DefaultComponent{
+			Entity: player,
+		},
 		ControllerId:      0,
-		Entity:            player,
 		Speed:             playerSpeed,
 		ControllerManager: controllerManager,
 	}
 
 	collisionComponent := &components.PlayerCollisionComponent{
-		Entity: player,
+		DefaultComponent: &components.DefaultComponent{
+			Entity: player,
+		},
+		PlayerJumpComponent: jumpComponent,
 	}
 
 	player.AddComponent(renderSpriteComponent)

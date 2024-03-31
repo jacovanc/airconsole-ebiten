@@ -11,7 +11,7 @@ import (
 )
 
 type RenderSpriteComponent struct {
-	Entity    interfaces.Entity
+	*DefaultComponent
 	Width	 int
 	Height	 int
 }
@@ -45,12 +45,4 @@ func (c *RenderSpriteComponent) OnDraw(screen *ebiten.Image, camera interfaces.C
 	// ebitenutil.DrawRect(screen, c.entity.position.x, c.entity.position.y, float64(c.width), float64(c.height), color.White)
 	ebitenutil.DrawRect(viewportImage, c.Entity.GetPosition().X - offset.X, c.Entity.GetPosition().Y - offset.Y, float64(c.Width), float64(c.Height), color.White)
 	return nil
-}
-
-func (c *RenderSpriteComponent) OnCollision(otherEntity interfaces.Entity) error {
-	return nil
-}
-
-func (c *RenderSpriteComponent) GetEntity() interfaces.Entity {
-	return c.Entity
 }

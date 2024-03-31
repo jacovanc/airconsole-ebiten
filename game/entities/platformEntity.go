@@ -15,7 +15,9 @@ func NewPlatformEntity(position shapes.Vector, dimensions shapes.Rectangle) inte
 		tags:       []string{"platform"},
 	}
 	platform.AddComponent(&components.RenderSpriteComponent{
-		Entity: platform, 
+		DefaultComponent: &components.DefaultComponent{
+			Entity: platform,
+		},
 		Width: int(dimensions.Width), 
 		Height: int(dimensions.Height),
 	})

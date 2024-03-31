@@ -10,6 +10,7 @@ import (
 )
 
 type CameraComponent struct {
+	*DefaultComponent
 	CameraEntity interfaces.Entity
 	// Viewport is a box that defines the camera's view. 
 	// The position is where it is drawn on the screen, and the box is the size of the view. 
@@ -21,10 +22,6 @@ func (c *CameraComponent) UniqueName() string {
 	return "cameraComponent"
 }
 
-func (c *CameraComponent) OnUpdate() error {
-	return nil
-}
-
 func (c *CameraComponent) OnDraw(screen *ebiten.Image, camera interfaces.CameraComponent) error {
 	// Draw a box around the camera's view
 	ebitenutil.DrawRect(screen, c.ViewPort.Position.X, c.ViewPort.Position.Y, c.ViewPort.Box.Width, c.ViewPort.Box.Height, color.White)
@@ -33,16 +30,12 @@ func (c *CameraComponent) OnDraw(screen *ebiten.Image, camera interfaces.CameraC
 	return nil
 }
 
-func (c *CameraComponent) OnCollision(otherEntity interfaces.Entity) error {
-	return nil
-}
-
 // Considers the entities width and hight to ensure it doesn't pop in and out of view
 func (c *CameraComponent) IsInView(entity interfaces.Entity) bool {
 	entityPosition := entity.GetPosition()
 	entityDimensions := entity.GetDimensions()
 
-	cameraEntityPosition := c.CameraEntity.GetPosition()
+	cameraEntityPosition := c.Entity.GetPosition()
 
 	// Check if the entity is in the camera's view
 	return entityPosition.X + entityDimensions.Width > cameraEntityPosition.X && entityPosition.X < cameraEntityPosition.X + c.ViewPort.Box.Width &&
@@ -51,8 +44,4 @@ func (c *CameraComponent) IsInView(entity interfaces.Entity) bool {
 
 func (c *CameraComponent) GetViewPort() shapes.CollisionBox {
 	return c.ViewPort
-}
-
-func (c *CameraComponent) GetEntity() interfaces.Entity {
-	return c.CameraEntity
 }

@@ -21,12 +21,16 @@ func NewCameraEntity(target interfaces.Entity, dimensions shapes.Rectangle) inte
 	}
 
 	camera.AddComponent(&components.CameraComponent{
-		CameraEntity: camera,
+		DefaultComponent: &components.DefaultComponent{
+			Entity: camera,
+		},
 		ViewPort:     cameraViewport,
 	})
 
 	camera.AddComponent(&components.CameraFollowComponent{
-		CameraEntity:       camera,
+		DefaultComponent: &components.DefaultComponent{
+			Entity: camera,
+		},
 		TargetEntity:       target,
 		ViewPort:           cameraViewport,
 		DistanceFromTop:    cameraViewport.Box.Height / 2,
