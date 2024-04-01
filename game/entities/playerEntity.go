@@ -19,48 +19,38 @@ func NewPlayerEntity(position shapes.Vector, controllerManager *controllers.Cont
 		position:   position,
 		dimensions: shapes.Rectangle{Width: playerWidth, Height: playerHeight},
 		components: []interfaces.Component{},
-		collisions: []shapes.CollisionBox{},
 		tags:       []string{"player"},
 	}
 
+	baseComponent := components.NewBaseComponent(player)
+
 	renderSpriteComponent := &components.RenderSpriteComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: player,
-		},
-		Width:  playerWidth,
-		Height: playerHeight,
+		BaseComponent: baseComponent,
+		Width:         playerWidth,
+		Height:        playerHeight,
 	}
 
 	jumpComponent := &components.PlayerJumpComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: player,
-		},
-		Velocity:  playerJumpSpeed, // Start jumping immediately
-		JumpSpeed: playerJumpSpeed,
+		BaseComponent: baseComponent,
+		Velocity:      playerJumpSpeed, // Start jumping immediately
+		JumpSpeed:     playerJumpSpeed,
 	}
 
 	inputComponent := &components.InputComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: player,
-		},
+		BaseComponent:     baseComponent,
 		ControllerId:      0,
 		Speed:             playerSpeed,
 		ControllerManager: controllerManager,
 	}
 
-	collisionComponent := &components.PlayerCollisionComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: player,
-		},
-		PlayerJumpComponent: jumpComponent,
-	}
+	playerCollisionComponent := components.NewPlayerCollisionComponent(player, jumpComponent, baseComponent)
+	// Add the collision box
+	playerCollisionComponent.AddCollisionBox(&shapes.CollisionBox{Position: player.position, Box: shapes.Rectangle{Width: playerWidth, Height: playerHeight}})
 
 	player.AddComponent(renderSpriteComponent)
 	player.AddComponent(jumpComponent)
 	player.AddComponent(inputComponent)
-	player.AddComponent(collisionComponent)
-
-	player.AddCollision(shapes.CollisionBox{Position: player.position, Box: shapes.Rectangle{Width: playerWidth, Height: playerHeight}})
+	player.AddComponent(playerCollisionComponent)
 
 	return player
 }

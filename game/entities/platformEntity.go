@@ -11,18 +11,21 @@ func NewPlatformEntity(position shapes.Vector, dimensions shapes.Rectangle) inte
 		position:   position,
 		dimensions: shapes.Rectangle{Width: dimensions.Width, Height: dimensions.Height},
 		components: []interfaces.Component{},
-		collisions: []shapes.CollisionBox{},
 		tags:       []string{"platform"},
 	}
+
+	baseComponent := components.NewBaseComponent(platform)
+
 	platform.AddComponent(&components.RenderSpriteComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: platform,
-		},
-		Width: int(dimensions.Width), 
-		Height: int(dimensions.Height),
+		BaseComponent: baseComponent,
+		Width:         int(dimensions.Width),
+		Height:        int(dimensions.Height),
 	})
 
-	platform.AddCollision(shapes.CollisionBox{Position: position, Box: shapes.Rectangle{Width: dimensions.Width, Height: dimensions.Height}})
+	collisionComponent := components.NewCollisionComponent(platform, baseComponent)
+	collisionComponent.AddCollisionBox(&shapes.CollisionBox{Position: position, Box: shapes.Rectangle{Width: dimensions.Width, Height: dimensions.Height}})
+
+	platform.AddComponent(collisionComponent)
 
 	return platform
 }

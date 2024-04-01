@@ -1,25 +1,30 @@
 package components
 
 import (
+	"github.com/jacovanc/airconsole-ebiten/game/collisions"
 	"github.com/jacovanc/airconsole-ebiten/game/interfaces"
+	"github.com/jacovanc/airconsole-ebiten/game/shapes"
 )
 
 type PlayerCollisionComponent struct {
-	*DefaultComponent
+	*BaseComponent
 	PlayerJumpComponent *PlayerJumpComponent
+	CollisionsBoxes     []*shapes.CollisionBox
+}
+
+func NewPlayerCollisionComponent(entity interfaces.Entity, playerJumpComponent *PlayerJumpComponent, baseComponent *BaseComponent) *PlayerCollisionComponent {
+	comp := &PlayerCollisionComponent{
+		BaseComponent:       NewBaseComponent(entity),
+		PlayerJumpComponent: playerJumpComponent,
+	}
+
+	collisions.AddToPool(comp)
+
+	return comp
 }
 
 func (c *PlayerCollisionComponent) UniqueName() string {
 	return "playerCollisionComponent"
-}
-
-func (c *PlayerCollisionComponent) OnUpdate() error {
-	collisions := c.Entity.GetCollisions()
-	// Move all the collisions with the player
-	for i := range *collisions {
-		(*collisions)[i].Position = *c.Entity.GetPosition()
-	}
-	return nil
 }
 
 func (c *PlayerCollisionComponent) OnCollision(otherEntity interfaces.Entity) error {
@@ -33,7 +38,7 @@ func (c *PlayerCollisionComponent) OnCollision(otherEntity interfaces.Entity) er
 			}
 
 			// If the the bottom of the player is lower than the bottom of the platform, don't do anything
-			if c.Entity.GetPosition().Y - float64(c.Entity.GetDimensions().Height) > otherEntity.GetPosition().Y - float64(otherEntity.GetDimensions().Height) {
+			if c.GetEntity().GetPosition().Y-float64(c.GetEntity().GetDimensions().Height) > otherEntity.GetPosition().Y-float64(otherEntity.GetDimensions().Height) {
 				return nil
 			}
 
@@ -42,4 +47,20 @@ func (c *PlayerCollisionComponent) OnCollision(otherEntity interfaces.Entity) er
 		}
 	}
 	return nil
+}
+
+func (c *PlayerCollisionComponent) OnUpdate() error {
+	// Move all the collisions with the player
+	for i := range c.CollisionsBoxes {
+		c.CollisionsBoxes[i].Position = *c.GetEntity().GetPosition()
+	}
+	return nil
+}
+
+func (e *PlayerCollisionComponent) AddCollisionBox(collisionBox *shapes.CollisionBox) {
+	e.CollisionsBoxes = append(e.CollisionsBoxes, collisionBox)
+}
+
+func (e *PlayerCollisionComponent) GetCollisionBoxes() []*shapes.CollisionBox {
+	return e.CollisionsBoxes
 }

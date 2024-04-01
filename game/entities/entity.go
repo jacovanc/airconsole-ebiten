@@ -7,17 +7,18 @@ import (
 )
 
 type Entity struct {
-	position shapes.Vector
+	position   shapes.Vector
 	dimensions shapes.Rectangle
 	components []interfaces.Component
-	collisions []shapes.CollisionBox
-	tags []string
+	tags       []string
 }
 
 func (e *Entity) Update() error {
 	for _, component := range e.components {
-		if err := component.OnUpdate(); err != nil {
-			return err
+		if updater, ok := component.(interfaces.Updateable); ok {
+			if err := updater.OnUpdate(); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -26,17 +27,10 @@ func (e *Entity) Update() error {
 // Offset handles the camera offset to ensure we render it inside the camera viewport
 func (e *Entity) Draw(screen *ebiten.Image, camera interfaces.CameraComponent) error {
 	for _, component := range e.components {
-		if err := component.OnDraw(screen, camera); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (e *Entity) Collision(otherEntity interfaces.Entity) error {
-	for _, component := range e.components {
-		if err := component.OnCollision(otherEntity); err != nil {
-			return err
+		if drawer, ok := component.(interfaces.Drawable); ok {
+			if err := drawer.OnDraw(screen, camera); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -56,19 +50,15 @@ func (e *Entity) RemoveComponent(component interfaces.Component) {
 
 func (e *Entity) GetComponent(uniqueName string) interfaces.Component {
 	for _, c := range e.components {
-		if(c.UniqueName() == uniqueName) {
+		if c.UniqueName() == uniqueName {
 			return c
 		}
 	}
 	return nil
 }
 
-func (e *Entity) AddCollision(collisionBox shapes.CollisionBox) {
-	e.collisions = append(e.collisions, collisionBox)
-}
-
-func (e *Entity) GetCollisions() *[]shapes.CollisionBox {
-	return &e.collisions
+func (e *Entity) GetComponents() []interfaces.Component {
+	return e.components
 }
 
 func (e *Entity) GetPosition() *shapes.Vector {

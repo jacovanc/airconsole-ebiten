@@ -7,9 +7,9 @@ import (
 )
 
 type InputComponent struct {
-	*DefaultComponent
-	ControllerId	  int
-	Speed     int
+	*BaseComponent
+	ControllerId      int
+	Speed             int
 	ControllerManager *controllers.ControllerManager
 }
 
@@ -23,11 +23,11 @@ func (c *InputComponent) OnUpdate() error {
 		fmt.Println("Controller not found")
 		return nil
 	}
-	if(controller.Inputs.KeyPressed["left"]) {
-		c.Entity.GetPosition().X -= float64(c.Speed)
+	if controller.Inputs.KeyPressed["left"] {
+		c.GetEntity().GetPosition().X -= float64(c.Speed)
 	}
-	if(controller.Inputs.KeyPressed["right"]) {
-		c.Entity.GetPosition().X += float64(c.Speed)
+	if controller.Inputs.KeyPressed["right"] {
+		c.GetEntity().GetPosition().X += float64(c.Speed)
 	}
 	return nil
 }

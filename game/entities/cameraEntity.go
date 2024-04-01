@@ -11,7 +11,6 @@ func NewCameraEntity(target interfaces.Entity, dimensions shapes.Rectangle) inte
 		position:   shapes.Vector{X: 0, Y: 0},
 		dimensions: shapes.Rectangle{Width: dimensions.Width, Height: dimensions.Height},
 		components: []interfaces.Component{},
-		collisions: []shapes.CollisionBox{},
 		tags:       []string{"camera"},
 	}
 
@@ -20,17 +19,15 @@ func NewCameraEntity(target interfaces.Entity, dimensions shapes.Rectangle) inte
 		Box:      shapes.Rectangle{Width: dimensions.Width, Height: dimensions.Height},
 	}
 
+	baseComponent := components.NewBaseComponent(camera)
+
 	camera.AddComponent(&components.CameraComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: camera,
-		},
-		ViewPort:     cameraViewport,
+		BaseComponent: baseComponent,
+		ViewPort:      cameraViewport,
 	})
 
 	camera.AddComponent(&components.CameraFollowComponent{
-		DefaultComponent: &components.DefaultComponent{
-			Entity: camera,
-		},
+		BaseComponent:      baseComponent,
 		TargetEntity:       target,
 		ViewPort:           cameraViewport,
 		DistanceFromTop:    cameraViewport.Box.Height / 2,

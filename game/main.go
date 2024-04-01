@@ -19,23 +19,22 @@ import (
 	_ "net/http/pprof"
 )
 
-
 const (
-	levelWidth  = 250
-	platformWidth = 32
+	levelWidth     = 250
+	platformWidth  = 32
 	platformHeight = 10
 )
 
-type Game struct{
+type Game struct {
 	controllerManager *controllers.ControllerManager
-	entitiesArray []interfaces.Entity
-	camerasArray []interfaces.Entity
+	entitiesArray     []interfaces.Entity
+	camerasArray      []interfaces.Entity
 
 	// Benchmarking
 	updateAccumulatedTime time.Duration
-    drawAccumulatedTime   time.Duration
-    frameCount            int
-	frameThreshold		 int
+	drawAccumulatedTime   time.Duration
+	frameCount            int
+	frameThreshold        int
 }
 
 func (g *Game) Update() error {
@@ -46,7 +45,7 @@ func (g *Game) Update() error {
 	overwritePlayer1ControllerWithArrowKeys(g.controllerManager)
 
 	// Check all collisions
-	collisions.CheckCollisions(g.entitiesArray)
+	collisions.CheckCollisions()
 
 	// Update cameras
 	for _, camera := range g.camerasArray {
@@ -72,7 +71,7 @@ func (g *Game) Update() error {
 	if g.frameCount >= g.frameThreshold {
 		log.Printf("Total update accumulated time: %v ms\n", g.updateAccumulatedTime.Milliseconds())
 		g.updateAccumulatedTime = 0 // Reset the accumulated time
-		g.frameCount = 0 // Reset the frame count
+		g.frameCount = 0            // Reset the frame count
 	}
 
 	return nil
@@ -85,13 +84,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Loop through players and output their inputs
 	for _, controller := range g.controllerManager.Controllers {
 		for input, pressed := range controller.Inputs.KeyPressed {
-			if(pressed) {
-				ebitenutil.DebugPrint(screen, "player " + strconv.Itoa(controller.Id + 1) + " is pressing key " + input)
+			if pressed {
+				ebitenutil.DebugPrint(screen, "player "+strconv.Itoa(controller.Id+1)+" is pressing key "+input)
 			}
 		}
 	}
 
-	// Draw entities in a camera view
+	// Draw the entities that are in a camera view
 	for _, camera := range g.camerasArray {
 		// Draw the camera view
 		cameraComponent := camera.GetComponent("cameraComponent").(*components.CameraComponent)
@@ -126,7 +125,7 @@ func main() {
 
 	// Sleep for a few seconds to allow the controller to connect
 	time.Sleep(5 * time.Second)
-	
+
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("Hello, World!")
 
@@ -150,11 +149,11 @@ func main() {
 	for i := 0; i < 100; i++ {
 		xPos := rand.Intn(levelWidth - platformWidth) // Don't place a platform outside the level width
 		// Ensure that xPos is within 200 pixels previous platform
-		if(i > 0) {
-			if(xPos < previousXPos - 150) {
+		if i > 0 {
+			if xPos < previousXPos-150 {
 				xPos = previousXPos - 150
 			}
-			if(xPos > previousXPos + 150) {
+			if xPos > previousXPos+150 {
 				xPos = previousXPos + 150
 			}
 		}
@@ -162,10 +161,10 @@ func main() {
 		yPos := -(i * 100) + 1000 // Offset the platforms by 1000 so that they start below the player not above
 
 		// Limit xPos to be between 0 and 640
-		if(xPos < 0) {
+		if xPos < 0 {
 			xPos = 0
 		}
-		if(xPos > 640) {
+		if xPos > 640 {
 			xPos = 640
 		}
 
@@ -179,10 +178,10 @@ func main() {
 	player1Camera := entities.NewCameraEntity(player1, shapes.Rectangle{Width: levelWidth, Height: 400})
 	camerasArray = append(camerasArray, player1Camera)
 
-	if err := ebiten.RunGame(&Game{ 
+	if err := ebiten.RunGame(&Game{
 		controllerManager: controllerManager,
-		entitiesArray: entitiesArray,
-		camerasArray: camerasArray,
+		entitiesArray:     entitiesArray,
+		camerasArray:      camerasArray,
 
 		// Benchmarking
 		frameThreshold: 1000,
@@ -193,15 +192,15 @@ func main() {
 
 func overwritePlayer1ControllerWithArrowKeys(controllerManager *controllers.ControllerManager) {
 	controller := controllerManager.GetController(0)
-	if(controller == nil) {
+	if controller == nil {
 		return
 	}
-	if(ebiten.IsKeyPressed(ebiten.KeyLeft)) {
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
 		controller.Inputs.KeyPressed["left"] = true
 	} else {
 		controller.Inputs.KeyPressed["left"] = false
 	}
-	if(ebiten.IsKeyPressed(ebiten.KeyRight)) {
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		controller.Inputs.KeyPressed["right"] = true
 	} else {
 		controller.Inputs.KeyPressed["right"] = false
