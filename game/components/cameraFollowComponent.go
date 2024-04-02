@@ -19,7 +19,7 @@ type CameraFollowComponent struct {
 }
 
 func (c *CameraFollowComponent) UniqueName() string {
-	return "cameraComponent"
+	return "cameraFollowComponent"
 }
 
 func (c *CameraFollowComponent) OnUpdate() error {
