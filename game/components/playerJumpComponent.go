@@ -1,6 +1,6 @@
 package components
 
-// This is actually handles both jumping and falling
+// This component handles both jumping and falling
 type PlayerJumpComponent struct {
 	*BaseComponent
 	JumpSpeed float64
