@@ -17,7 +17,7 @@ type RenderSpriteComponent struct {
 }
 
 func (c *RenderSpriteComponent) UniqueName() string {
-	return "inputComponent"
+	return "renderSpriteComponent"
 }
 
 func (c *RenderSpriteComponent) OnUpdate() error {
